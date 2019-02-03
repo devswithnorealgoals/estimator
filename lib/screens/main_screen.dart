@@ -1,4 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:estimator/models/question.dart';
+import 'package:estimator/services/question_service.dart';
+import 'package:estimator/widgets/question_widget.dart';
 import 'package:flutter/material.dart';
 
 class MainScreen extends StatefulWidget {
@@ -9,19 +11,27 @@ class MainScreen extends StatefulWidget {
 }
 
 class MainState extends State<MainScreen> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  QuestionService _questionService = QuestionService();
+  Question _question;
+
   @override
   Widget build(BuildContext context) {
+    getActiveQuestion();
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Main'),
-      ),
-      body: RaisedButton(
-        child: Text("Logout"),
-        onPressed: () {
-          _auth.signOut();
-        },
-      ),
-    );
+        appBar: AppBar(
+          title: Text('Main'),
+        ),
+        body: new Center(
+          child: _question == null
+              ? Text("No question")
+              : QuestionWidget(_question),
+        ));
+  }
+
+  getActiveQuestion() async {
+    Question q = await _questionService.fetchActiveQuestion();
+    setState(() {
+      _question = q;
+    });
   }
 }
