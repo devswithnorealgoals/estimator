@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
+
 class QuestionScreenWidget extends StatelessWidget {
   final Color color;
   final Text question;
@@ -14,15 +15,20 @@ class QuestionScreenWidget extends StatelessWidget {
   }
 
   String _currentAnswer = '';
+  String _questionId = '';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder(
-      stream: Firestore.instance.collection('questions').snapshots(),
+      stream: Firestore.instance.collection('questions').where("active", isEqualTo: true).snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData)
           return Text('No available question... please wait for next one');
+        else { print('=== data ===: ${snapshot.data.documents.length}');
+          _questionId = snapshot.data.documents[0].documentID.toString();
+          print(_questionId);
+        }
         return Container(
           padding: EdgeInsets.all(20),
           color: Colors.white24,
@@ -31,7 +37,7 @@ class QuestionScreenWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 Text(
-                  snapshot.data.documents[1]['question'],
+                  snapshot.data.documents[0]['question'],
                   style: TextStyle(fontSize: 30),
                 ),
                 TextField(
@@ -48,9 +54,11 @@ class QuestionScreenWidget extends StatelessWidget {
                         functionName: 'answered',
                         parameters: <String, dynamic>{
                           'message': 'hello world!',
+                          'question': _questionId,
                           'answer': _currentAnswer,
                         },
                       );
+                      print("response");
                       print(resp);
                     } on CloudFunctionsException catch (e) {
                       print('caught firebase functions exception');

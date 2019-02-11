@@ -18,6 +18,7 @@
 
 # Firebase functions related
 functions/node_modules/
+firebase-services/functions/serviceAccountKey.json
 
 # Visual Studio Code related
 .vscode/
