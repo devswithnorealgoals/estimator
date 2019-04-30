@@ -23,11 +23,11 @@ class QuestionScreenWidget extends StatelessWidget {
       body: StreamBuilder(
       stream: Firestore.instance.collection('questions').where("active", isEqualTo: true).snapshots(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData)
+        if (!snapshot.hasData || (snapshot.hasData && snapshot.data.documents.length == 0))
           return Text('No available question... please wait for next one');
         else { print('=== data ===: ${snapshot.data.documents.length}');
           _questionId = snapshot.data.documents[0].documentID.toString();
-          print(_questionId);
+          print("id " + _questionId);
         }
         return Container(
           padding: EdgeInsets.all(20),
